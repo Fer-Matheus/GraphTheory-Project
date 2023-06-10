@@ -29,5 +29,6 @@ print(f'G.d({vertice}): {graph.d(vertice)}')
 print(f'G.minD(): {graph.minD()}')
 print(f'G.maxD(): {graph.maxD()}')
 print("#"*100)
-
-print(f'BFS Algorithm: {graph.bfs(vertice)}')
+T = graph.bfs(vertice)
+print(f'BFS Algorithm: {T}')
+print(f'BFS Algorithm size: {len(T)}')
