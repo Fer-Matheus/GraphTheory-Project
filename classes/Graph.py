@@ -1,7 +1,8 @@
 import time
 class Graph:
-    def __init__(self, adjacencyList=dict):
-        self.adjacencyList = adjacencyList
+    def __init__(self, file_path):
+        self.adjacencyList = {}
+        self.ReadFile(file_path)
 
     def n(self):
         return len(self.adjacencyList.keys())
@@ -29,6 +30,7 @@ class Graph:
         distance, father = 0, None
         T = []
         visited, Q = set(), []
+        T.append((distance, father))
         Q.append(vertice)
 
         while Q:
@@ -40,8 +42,26 @@ class Graph:
             father = vert
             neighbor = self.neighbor(vert)
             for i, _ in neighbor:
-                if i in visited:
+                if i in visited or i in Q:
                     continue
                 T.append((distance, father))
                 Q.append(i)
         return T
+    
+    def ReadFile(self,file_path):
+        # Executando a leitura do db e armazenando em lines
+        with open(file_path, "+r") as line:
+            lines = line.readlines()
+
+        # Tratando a lista lines para preencher de forma correta os vertices e arestas
+        for line in lines:
+
+            _, verticeA, verticeB, weight = line.split(" ")
+            if verticeA in self.adjacencyList.keys():
+               self.adjacencyList[verticeA].append((verticeB, weight))
+            else:
+               self.adjacencyList.update({verticeA: [(verticeB, weight)]})
+            if verticeB in self.adjacencyList.keys():
+               self.adjacencyList[verticeB].append((verticeA, weight))
+            else:
+               self.adjacencyList.update({verticeB: [(verticeA, weight)]})
