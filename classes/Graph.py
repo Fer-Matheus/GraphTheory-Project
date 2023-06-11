@@ -1,4 +1,3 @@
-import time
 class Graph:
     def __init__(self, file_path):
         self.adjacencyList = {}
@@ -8,29 +7,34 @@ class Graph:
         return len(self.adjacencyList.keys())
 
     def m(self):
-        count = 0
+        edges = set()
         for edge in self.adjacencyList.values():
-            count += len(edge)
-        return count
+            for item in edge:
+                edges.add(item)
+        return len(edges)
 
     def neighbor(self, vertice):
-        return self.adjacencyList[vertice]
+        neighbor = set()
+        for i in self.adjacencyList[vertice]:
+            neighbor.add(i)
+        return neighbor
 
     def d(self, vertice):
-        return len(self.adjacencyList[vertice])
+        return len(self.neighbor(vertice))
 
     def minD(self):
-        return min([len(value) for value in self.adjacencyList.values()])
+        return min([self.d(keys) for keys in self.adjacencyList.keys()])
 
     def maxD(self):
-        return max(len(value) for value in self.adjacencyList.values())
+        return max([self.d(keys) for keys in self.adjacencyList.keys()])
 
     def bfs(self, vertice):
 
         distance, father = 0, None
-        T = []
+        d, fathers = {}, {}
         visited, Q = set(), []
-        T.append((distance, father))
+        d[vertice] = 0
+        fathers[vertice] = None
         Q.append(vertice)
 
         while Q:
@@ -44,11 +48,35 @@ class Graph:
             for i, _ in neighbor:
                 if i in visited or i in Q:
                     continue
-                T.append((distance, father))
+                d[i] = distance
+                fathers[i] = father
                 Q.append(i)
-        return T
-    
-    def ReadFile(self,file_path):
+        return d, fathers
+
+    def dfs(self, vertice):
+        visited, temp, father = set(), 0, None
+        initTime, endTime, fathers, Q = {}, {}, {}, []
+        Q.append(vertice)
+
+        while Q:
+            vert = Q.pop(0)
+            if vert not in visited:
+                visited.add(vert)
+                temp += 1
+                initTime[vert] = temp
+                fathers[vert] = father
+                neighbors = self.neighbor(vert)
+                father = vert
+                for i, _ in neighbors:
+                    if i not in visited and i not in Q:
+                        Q.append(i)
+        for vert in visited:
+            endTime[vert] = temp
+            temp += 1
+
+        return initTime, endTime, fathers
+
+    def ReadFile(self, file_path):
         # Executando a leitura do db e armazenando em lines
         with open(file_path, "+r") as line:
             lines = line.readlines()
@@ -58,10 +86,10 @@ class Graph:
 
             _, verticeA, verticeB, weight = line.split(" ")
             if verticeA in self.adjacencyList.keys():
-               self.adjacencyList[verticeA].append((verticeB, weight))
+                self.adjacencyList[verticeA].append((verticeB, weight))
             else:
-               self.adjacencyList.update({verticeA: [(verticeB, weight)]})
+                self.adjacencyList.update({verticeA: [(verticeB, weight)]})
             if verticeB in self.adjacencyList.keys():
-               self.adjacencyList[verticeB].append((verticeA, weight))
+                self.adjacencyList[verticeB].append((verticeA, weight))
             else:
-               self.adjacencyList.update({verticeB: [(verticeA, weight)]})
+                self.adjacencyList.update({verticeB: [(verticeA, weight)]})

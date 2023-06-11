@@ -1,10 +1,10 @@
 from classes.Graph import Graph
 # Obtendo o caminho do db
-file_path = "db/USA-road-d.NY.gr.txt"
+file_path = "db/USA-road-d.NY.gr.txt" if False else "db/Teste.txt"
 
 graph = Graph(file_path)
 
-vertice = '5'
+vertice = 'A' if "Teste" in file_path else '5'
 
 print('\n > Graph attributes')
 print(f'G.n(): {graph.n()}')
@@ -18,6 +18,12 @@ print('\n')
 print("#"*100)
 print('\n')
 
-T = graph.bfs(vertice)
-print(f'BFS Algorithm: {T}')
-print(f'BFS Algorithm size: {len(T)}')
+d, fathers = graph.bfs(vertice)
+print(f'\nBFS Algorithm: \nDistance:{d}\n\nFathers:{fathers}')
+
+initTime, endTime, fathers = graph.dfs(vertice)
+
+print(f'\n\nDFS Algorithm:')
+print(f'InitTime: {initTime}')
+print(f'EndTime: {endTime}')
+print(f'Fathers: {fathers}')
