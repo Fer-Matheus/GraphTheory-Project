@@ -1,10 +1,11 @@
 from classes.Graph import Graph
 # Obtendo o caminho do db
-file_path = "db/USA-road-d.NY.gr.txt" if False else "db/Teste.txt"
+filePath, fileName = ("db/USA-road-d.NY.gr.txt",
+                      "USA-road-d.NY.gr") if True else ("db/Teste.txt", "Teste")
 
-graph = Graph(file_path)
+graph = Graph((filePath))
 
-vertice = 'A' if "Teste" in file_path else '5'
+vertice = 'A' if "Teste" in filePath else '12'
 
 print('\n > Graph attributes')
 print(f'G.n(): {graph.n()}')
@@ -27,3 +28,4 @@ print(f'\n\nDFS Algorithm:')
 print(f'InitTime: {initTime}')
 print(f'EndTime: {endTime}')
 print(f'Fathers: {fathers}')
+

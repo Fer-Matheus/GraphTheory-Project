@@ -1,8 +1,36 @@
 class Graph:
-    def __init__(self, file_path):
+    def __init__(self, filePath=str):
         self.adjacencyList = {}
-        self.ReadFile(file_path)
+        self.ReadFile(filePath)
 
+    def ReadFile(self, filePath):
+        # Executando a leitura do db e armazenando em lines
+        with open(filePath, "+r") as line:
+            lines = line.readlines()
+
+        # Tratando a lista lines para preencher de forma correta os vertices e arestas
+        for line in lines:
+
+            _, verticeA, verticeB, weight = line.split(" ")
+            weight = int(weight)
+            if verticeA in self.adjacencyList.keys():
+                self.adjacencyList[verticeA].append((verticeB, weight))
+            else:
+                self.adjacencyList.update({verticeA: [(verticeB, weight)]})
+            if verticeB in self.adjacencyList.keys():
+                self.adjacencyList[verticeB].append((verticeA, weight))
+            else:
+                self.adjacencyList.update({verticeB: [(verticeA, weight)]})
+
+    def showGraph(self):
+        for vertice in self.adjacencyList.keys():
+            print(f"{vertice}: {self.neighbor(vertice)}")
+            
+    def writeAdjacencyList(self, fileName):
+        with open(f"db/{fileName}_AdjacencyList.txt", "+w") as file:
+            for vertice in self.adjacencyList.keys():
+                file.write(f"{vertice}: {self.neighbor(vertice)}\n")
+        
     def n(self):
         return len(self.adjacencyList.keys())
 
@@ -76,20 +104,4 @@ class Graph:
 
         return initTime, endTime, fathers
 
-    def ReadFile(self, file_path):
-        # Executando a leitura do db e armazenando em lines
-        with open(file_path, "+r") as line:
-            lines = line.readlines()
-
-        # Tratando a lista lines para preencher de forma correta os vertices e arestas
-        for line in lines:
-
-            _, verticeA, verticeB, weight = line.split(" ")
-            if verticeA in self.adjacencyList.keys():
-                self.adjacencyList[verticeA].append((verticeB, weight))
-            else:
-                self.adjacencyList.update({verticeA: [(verticeB, weight)]})
-            if verticeB in self.adjacencyList.keys():
-                self.adjacencyList[verticeB].append((verticeA, weight))
-            else:
-                self.adjacencyList.update({verticeB: [(verticeA, weight)]})
+    
