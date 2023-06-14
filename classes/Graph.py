@@ -3,6 +3,9 @@ class Graph:
         self.adjacencyList = {}
         self.ReadFile(filePath)
 
+    def verifyVertice(self, vertice):
+        return vertice in self.adjacencyList.keys()
+
     def ReadFile(self, filePath):
         # Executando a leitura do db e armazenando em lines
         with open(filePath, "+r") as line:
@@ -25,12 +28,12 @@ class Graph:
     def showGraph(self):
         for vertice in self.adjacencyList.keys():
             print(f"{vertice}: {self.neighbor(vertice)}")
-            
+
     def writeAdjacencyList(self, fileName):
         with open(f"db/{fileName}_AdjacencyList.txt", "+w") as file:
             for vertice in self.adjacencyList.keys():
                 file.write(f"{vertice}: {self.neighbor(vertice)}\n")
-        
+
     def n(self):
         return len(self.adjacencyList.keys())
 
@@ -104,4 +107,39 @@ class Graph:
 
         return initTime, endTime, fathers
 
-    
+    def BellmanFord(self, vertice):
+        # inicializando os dicionarios com as distâncias e predecessores
+        d, father = {}, {}
+        [d.update({vertice: 100000}) for vertice in self.adjacencyList.keys()]
+        [father.update({vertice: None})
+         for vertice in self.adjacencyList.keys()]
+
+        d[vertice] = 0
+        father[vertice] = None
+        if self.relaxStep(d, father, vertice):
+            for vertice in self.adjacencyList.keys():
+                neighbors = self.neighbor(vertice)
+                for neighbor, weight in neighbors:
+                    if d[neighbor] < d[vertice] + weight:
+                        return None, None, "Negative cicles detect"
+                return d, father, None
+        return d, father, None
+
+    def relaxStep(self, d, father, first):
+        verifyChange = False
+        neighbors = self.neighbor(first)
+        for neighbor, weight in neighbors:
+            if d[neighbor] > d[first] + weight:
+                d[neighbor] = d[first] + weight
+                father[neighbor] = first
+                verifyChange = True
+        for vertice in self.adjacencyList.keys():
+            if vertice == first:
+                continue
+            neighbors = self.neighbor(vertice)
+            for neighbor, weight in neighbors:
+                if d[neighbor] > d[vertice] + weight:
+                    d[neighbor] = d[vertice] + weight
+                    father[neighbor] = vertice
+                    verifyChange = True
+        return verifyChange
