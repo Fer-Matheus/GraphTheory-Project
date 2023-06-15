@@ -1,3 +1,5 @@
+import heapq
+
 MAX_SIZE = 10000000000000000000000000000000000000000000
 class Graph:
     def __init__(self, filePath=str):
@@ -62,11 +64,11 @@ class Graph:
 
     def bfs(self, vertice):
 
-        distance, father = 0, None
-        d, fathers = {}, {}
+        distance, parent = 0, None
+        d, parents = {}, {}
         visited, Q = set(), []
         d[vertice] = 0
-        fathers[vertice] = None
+        parents[vertice] = None
         Q.append(vertice)
 
         while Q:
@@ -75,19 +77,19 @@ class Graph:
                 continue
             visited.add(vert)
             distance += 1
-            father = vert
+            parent = vert
             neighbor = self.neighbor(vert)
             for i, _ in neighbor:
                 if i in visited or i in Q:
                     continue
                 d[i] = distance
-                fathers[i] = father
+                parents[i] = parent
                 Q.append(i)
-        return d, fathers
+        return d, parents
 
     def dfs(self, vertice):
-        visited, temp, father = set(), 0, None
-        initTime, endTime, fathers, Q = {}, {}, {}, []
+        visited, temp, parent = set(), 0, None
+        initTime, endTime, parents, Q = {}, {}, {}, []
         Q.append(vertice)
 
         while Q:
@@ -96,9 +98,9 @@ class Graph:
                 visited.add(vert)
                 temp += 1
                 initTime[vert] = temp
-                fathers[vert] = father
+                parents[vert] = parent
                 neighbors = self.neighbor(vert)
-                father = vert
+                parent = vert
                 for i, _ in neighbors:
                     if i not in visited and i not in Q:
                         Q.append(i)
@@ -106,43 +108,78 @@ class Graph:
             endTime[vert] = temp
             temp += 1
 
-        return initTime, endTime, fathers
+        return initTime, endTime, parents
 
     def BellmanFord(self, vertice):
         # inicializando os dicionarios com as distâncias e predecessores
-        d, father = {}, {}
+        d, parent = {}, {}
         [d.update({vertice: MAX_SIZE}) for vertice in self.adjacencyList.keys()]
-        [father.update({vertice: None})
+        [parent.update({vertice: None})
          for vertice in self.adjacencyList.keys()]
 
         d[vertice] = 0
-        father[vertice] = None
+        parent[vertice] = None
 
         while True:
-            if not self.relaxStep(d, father, vertice):
+            if not self.relaxStep(d, parent, vertice):
                 break
         for vertice in self.adjacencyList.keys():
             neighbors = self.neighbor(vertice)
             for neighbor, weight in neighbors:
                 if d[neighbor] > d[vertice] + weight:
                     return None, None, "Negative cicles detect"
-        return d, father, None
+        return d, parent, None
 
-    def relaxStep(self, d, father, first):
+    def relaxBF(self, d, parent, first):
         verifyChange = False        
         neighbors = self.neighbor(first)
         for neighbor, weight in neighbors:
             if d[neighbor] > d[first]+weight:
                 d[neighbor] = d[first] + weight
-                father[neighbor] = first
+                parent[neighbor] = first
 
         for vertice in self.adjacencyList.keys():
             neighbors = self.neighbor(vertice)
             for neighbor, weight in neighbors:
                 if d[neighbor] > d[vertice]+weight:
                     d[neighbor] = d[vertice] + weight
-                    father[neighbor] = vertice
+                    parent[neighbor] = vertice
                     verifyChange = True
         return verifyChange
-        
     
+    def Dijkstra(self, vertice):
+        d, parent, Q , visited = {}, {}, [], set()
+        [d.update({vert: MAX_SIZE})for vert in self.adjacencyList.keys()]
+        [parent.update({vert: None}) for vert in self.adjacencyList.keys()]
+
+        d[vertice] = 0
+        heapq.heappush(Q,(vertice, 0))
+        """
+            vert = A
+            A : (C,B)
+            Q = B, B
+            visited = C, A
+        """
+        while Q:
+            vert, w = heapq.heappop(Q) # B 
+            if vert in visited:
+                continue
+            visited.add(vert) # 
+            self.relaxDijkstra(d,parent, vert)
+            neighbors = self.neighbor(vert)
+            for neighbor, weight in neighbors:
+                if neighbor in visited or neighbor in Q:
+                    continue
+                heapq.heappush(Q,(neighbor, weight+w))
+
+        return d, parent
+
+
+    def relaxDijkstra(self, d, parent,vertice):
+        neighbors = self.neighbor(vertice)
+        for neighbor, weight in neighbors:
+            if d[neighbor] > d[vertice] + weight:
+                d[neighbor] = d[vertice] + weight
+                parent[neighbor] = vertice
+
+

@@ -1,7 +1,7 @@
 from classes.Graph import Graph
 # Obtendo o caminho do db
 filePath, fileName = ("db/USA-road-d.NY.gr.txt",
-                      "USA-road-d.NY.gr") if False else ("db/Teste.txt", "Teste")
+                      "USA-road-d.NY.gr") if True else ("db/Teste.txt", "Teste")
 
 graph = Graph((filePath))
 
@@ -31,13 +31,17 @@ while True:
         # print(f'InitTime: \n{initTime}')
         # print(f'EndTime: \n{endTime}')
         # print(f'Fathers: \n{fathers}')
-        d, father, err = graph.BellmanFord(vertice)
-        if err != None:
-            print(err)
-        else:
-            print(f"BellmanFord Algorithm for the vertice: {vertice}")
-            print(f'\nDistance:\n{d}\nFather:\n{father}')
-        print()
+        # d, father, err = graph.BellmanFord(vertice)
+        # if err != None:
+        #     print(err)
+        # else:
+        #     print(f"BellmanFord Algorithm for the vertice: {vertice}")
+        #     print(f'\nDistance:\n{d}\nFather:\n{father}')
+        # print()
+
+        d, father= graph.Dijkstra(vertice)
+        print(f"Dijkstra Algorithm for the vertice: {vertice}")
+        print(f'\nDistance:\n{d}\nFather:\n{father}')
         break
     else:
         print(f"The vertice: {vertice} isn't present on this graph!")
