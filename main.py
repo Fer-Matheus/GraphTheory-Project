@@ -21,27 +21,32 @@ while True:
         # print("#"*100)
         # print('\n')
 
-        # d, fathers = graph.bfs(vertice)
+        # d, parents = graph.bfs(vertice)
         # print(
-        #     f'\nBFS Algorithm for the vertice({vertice}): \nDistance:{d}\n\nFathers:{fathers}')
+        #     f'\nBFS Algorithm for the vertice({vertice}): \nDistance:{d}\n\nparents:{parents}')
 
-        # initTime, endTime, fathers = graph.dfs(vertice)
+        # initTime, endTime, parents = graph.dfs(vertice)
 
         # print(f'\n\nDFS Algorithm for the vertice({vertice}):')
         # print(f'InitTime: \n{initTime}')
         # print(f'EndTime: \n{endTime}')
-        # print(f'Fathers: \n{fathers}')
-        # d, father, err = graph.BellmanFord(vertice)
+        # print(f'parents: \n{parents}')
+
+        # d, parent, err = graph.BellmanFord(vertice)
         # if err != None:
         #     print(err)
         # else:
         #     print(f"BellmanFord Algorithm for the vertice: {vertice}")
-        #     print(f'\nDistance:\n{d}\nFather:\n{father}')
+        #     print(f'\nDistance:\n{d}\nparent:\n{parent}')
         # print()
 
-        d, father= graph.Dijkstra(vertice)
-        print(f"Dijkstra Algorithm for the vertice: {vertice}")
-        print(f'\nDistance:\n{d}\nFather:\n{father}')
+        d, parent= graph.Dijkstra(vertice)
+        # print(f"Dijkstra Algorithm for the vertice: {vertice}")
+        # print(f'\nDistance:\n{d}\nparent:\n{parent}')
+        valor = int(input("Digite um valor: \n"))
+        caminho = graph.EncontrarCaminho(valor, parent)
+        # caminho = graph.EncontrarCiclo(valor, parent)
+        print(caminho)
         break
     else:
         print(f"The vertice: {vertice} isn't present on this graph!")

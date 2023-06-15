@@ -153,7 +153,7 @@ class Graph:
         [parent.update({vert: None}) for vert in self.adjacencyList.keys()]
 
         d[vertice] = 0
-        heapq.heappush(Q,(vertice, 0))
+        heapq.heappush(Q,vertice)
         """
             vert = A
             A : (C,B)
@@ -161,17 +161,16 @@ class Graph:
             visited = C, A
         """
         while Q:
-            vert, w = heapq.heappop(Q) # B 
+            vert = heapq.heappop(Q) # B 
             if vert in visited:
                 continue
             visited.add(vert) # 
             self.relaxDijkstra(d,parent, vert)
             neighbors = self.neighbor(vert)
-            for neighbor, weight in neighbors:
+            for neighbor, _ in neighbors:
                 if neighbor in visited or neighbor in Q:
                     continue
-                heapq.heappush(Q,(neighbor, weight+w))
-
+                heapq.heappush(Q,neighbor)
         return d, parent
 
 
@@ -183,3 +182,17 @@ class Graph:
                 parent[neighbor] = vertice
 
 
+    def EncontrarCaminho(self, valor, T):
+        testados, caminho = set(), []
+        for vertice in self.adjacencyList.keys():
+            if vertice not in testados:
+                testados.add(vertice)
+                pai = T[vertice]
+                while pai != None:
+                    caminho.append(pai)
+                    pai = T[pai]
+                if len(caminho) == valor:
+                    return caminho
+                else:
+                    caminho.clear()
+                    continue
