@@ -1,53 +1,53 @@
-from classes.Graph import Graph
+from classes.Grafo import Grafo
 # Obtendo o caminho do db
-filePath, fileName = ("db/USA-road-d.NY.gr.txt",
+caminhoArquivo, nomeArquivo = ("db/USA-road-d.NY.gr.txt",
                       "USA-road-d.NY.gr") if True else ("db/Teste.txt", "Teste")
 
-graph = Graph((filePath))
+grafo = Grafo((caminhoArquivo))
 
 while True:
     vertice = input("Choose one vertice: ")
-    vertice = vertice.upper() if "Teste" in filePath else '12'
-    if graph.verifyVertice(vertice):
-        print('\n > Graph attributes')
-        print(f'G.n(): {graph.n()}')
-        print(f'G.m(): {graph.m()}')
-        print(f'G.neighbor({vertice}): {graph.neighbor(vertice)}')
-        print(f'G.d({vertice}): {graph.d(vertice)}')
-        print(f'G.minD(): {graph.minD()}')
-        print(f'G.maxD(): {graph.maxD()}')
+    vertice = vertice.upper() if "Teste" in caminhoArquivo else '12'
+    if grafo.verificaVertice(vertice):
+        print('\n > Grafo attributes')
+        print(f'G.n(): {grafo.n()}')
+        print(f'G.m(): {grafo.m()}')
+        print(f'G.vizinho({vertice}): {grafo.vizinho(vertice)}')
+        print(f'G.d({vertice}): {grafo.d(vertice)}')
+        print(f'G.minD(): {grafo.minD()}')
+        print(f'G.maxD(): {grafo.maxD()}')
 
-        # print('\n')
-        # print("#"*100)
-        # print('\n')
+        print('\n')
+        print("#"*100)
+        print('\n')
 
-        # d, parents = graph.bfs(vertice)
-        # print(
-        #     f'\nBFS Algorithm for the vertice({vertice}): \nDistance:{d}\n\nparents:{parents}')
+        d, antecessores = grafo.bfs(vertice)
+        print(
+            f'\nBFS Algorithm for the vertice({vertice}): \nDistance:{d}\n\nAntecessores:{antecessores}')
 
-        # initTime, endTime, parents = graph.dfs(vertice)
+        tempoInicial, tempoFinal, antecessores = grafo.dfs(vertice)
 
-        # print(f'\n\nDFS Algorithm for the vertice({vertice}):')
-        # print(f'InitTime: \n{initTime}')
-        # print(f'EndTime: \n{endTime}')
-        # print(f'parents: \n{parents}')
+        print(f'\n\nDFS Algorithm for the vertice({vertice}):')
+        print(f'tempoInicial: \n{tempoInicial}')
+        print(f'tempoFinal: \n{tempoFinal}')
+        print(f'antecessores: \n{antecessores}')
 
-        # d, parent, err = graph.BellmanFord(vertice)
-        # if err != None:
-        #     print(err)
-        # else:
-        #     print(f"BellmanFord Algorithm for the vertice: {vertice}")
-        #     print(f'\nDistance:\n{d}\nparent:\n{parent}')
-        # print()
+        d, antecessores, err = grafo.BellmanFord(vertice)
+        if err != None:
+            print(err)
+        else:
+            print(f"BellmanFord Algorithm for the vertice: {vertice}")
+            print(f'\nDistance:\n{d}\nantecessores:\n{antecessores}')
+        print()
 
-        d, parent= graph.Dijkstra(vertice)
+        d, antecessores= grafo.Dijkstra(vertice)
         # print(f"Dijkstra Algorithm for the vertice: {vertice}")
-        # print(f'\nDistance:\n{d}\nparent:\n{parent}')
+        # print(f'\nDistance:\n{d}\nantecessores:\n{antecessores}')
         valor = int(input("Digite um valor: \n"))
-        caminho = graph.EncontrarCaminho(valor, parent)
-        # caminho = graph.EncontrarCiclo(valor, parent)
+        caminho = grafo.EncontrarCaminho(valor, antecessores)
+        
         print(caminho)
         break
     else:
-        print(f"The vertice: {vertice} isn't present on this graph!")
+        print(f"The vertice: {vertice} isn't present on this Grafo!")
     
