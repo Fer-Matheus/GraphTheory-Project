@@ -1,102 +1,68 @@
-import heapq
-import operator
-# Cófigo fonte da Classe Grafo que será base para comportar todas as funcionalidades de grafos não orientados
-
+from classes.Grafo import Grafo
+import heapq, operator
 # Tamanho inicial das arestas antes do relaxamento
 MAX_TAM = 10000000000000000000000000000000000000000000
-
-
-class Grafo:
-
-    # Construtor da classe que inicializa a lista de adjacência usada como representação do grafo
-    """Exemplo:
-        {
-            vertice1: [(vizinho1, peso), (vizninho2,peso), ...]
-            .
-            .
-            .
-        }
-    """
-
+class Digrafo(Grafo):
     def __init__(self, caminhoArquivo=str):
         self.listaAdjacencia = {}
         self.LerArquivo(caminhoArquivo)
 
-    # Um verificador que identifica a presença de um determinado vertice dentro do conjunto de vertices
-    def verificaVertice(self, vertice):
-        return vertice in self.listaAdjacencia.keys()
-
-    # Leitura do arquivo que contém o banco de dados a ser tratado como grafo
     def LerArquivo(self, caminhoArquivo):
-
-        # Executando a leitura do db e armazenando em linhas
         with open(caminhoArquivo, "+r") as linha:
             linhas = linha.readlines()
 
-        # Um simples tratamento de erros caso seja lido uma linha que não contém arcos.
         try:
             for linha in linhas:
-                # Nesse ponto a linha é dividinda entre os espaços, ficando: a, vertice1, vertice2, '111\n'
                 _, verticeA, verticeB, peso = linha.split(" ")
-                # Convertendo os pesos de string para inteiro, para que sejá possivel calcular os pesos nos algoritmos de caminhos
                 peso = int(peso)
-
-                # Aqui são armazenados os vizinhos de cada vertice
                 if verticeA in self.listaAdjacencia.keys():
-                    self.listaAdjacencia[verticeA].append((verticeB, peso))
+                    if "positivo" in self.listaAdjacencia[verticeA].keys():
+                        self.listaAdjacencia[verticeA]["positivo"].append(
+                            (verticeB, peso))
+                    else:
+                        self.listaAdjacencia[verticeA].update(
+                            {"positivo": [(verticeB, peso)]})
                 else:
-                    self.listaAdjacencia.update({verticeA: [(verticeB, peso)]})
-
-                # Por se tratar de um grafo não orientado, os vizinhos que incedem no vertice também são adicionados
+                    self.listaAdjacencia.update(
+                        {verticeA: {"positivo": [(verticeB, peso)]}})
                 if verticeB in self.listaAdjacencia.keys():
-                    self.listaAdjacencia[verticeB].append((verticeA, peso))
+                    if "negativo" in self.listaAdjacencia[verticeB].keys():
+                        self.listaAdjacencia[verticeB]["negativo"].append(
+                            (verticeA, peso))
+                    else:
+                        self.listaAdjacencia[verticeB].update(
+                            {"negativo": [(verticeA, peso)]})
                 else:
-                    self.listaAdjacencia.update({verticeB: [(verticeA, peso)]})
+                    self.listaAdjacencia.update(
+                        {verticeB: {"negativo": [(verticeA, peso)]}})
         except:
             pass
 
-    # Uma função que apenas exibe o grafo em forma de lista de adjacência
     def MostrarGrafo(self):
         for vertice in self.listaAdjacencia.keys():
-            print(f"{vertice}: {self.vizinho(vertice)}")
+            p, n = self.vizinho(vertice)
+            print(
+                f'Vertice({vertice}):\n"positivos" : {p} || "negativos" : {n}')
 
-    # função que cria um arquivo no formato {vertice: [lista de vizinhos]}, apenas para facilitar uma verificação nossa nos testes
-    def EscrevelistaAdjacencia(self, nomeArquivo):
-        with open(f"db/{nomeArquivo}_listaAdjacencia.txt", "+w") as arquivo:
-            for vertice in self.listaAdjacencia.keys():
-                arquivo.write(f"{vertice}: {self.vizinho(vertice)}\n")
-
-    # Cálculo do número de vertices
-    def n(self):
-        return len(self.listaAdjacencia.keys())
-
-    # Cálculo do número de arestas, mas ignorando os vizinhos repetidos do grafo não orientado
-    def m(self):
-        arestas = set()
-        for aresta in self.listaAdjacencia.values():
-            for item in aresta:
-                arestas.add(item)
-        return len(arestas)
-
-    # Método que lista os vizinhos de um vertice, ignorando os repetidos
     def vizinho(self, vertice):
-        vizinho = set()
-        for i in self.listaAdjacencia[vertice]:
-            vizinho.add(i)
-        return vizinho
+        positivos, negativos = set(), set()
 
-    # Tendo a função que retorna os vizinhos de um vertice, apenas calculamos o tamanho dessa lista para encontrar o grau desse vertice.
+        for p in self.listaAdjacencia[vertice]["positivo"]:
+            positivos.add(p)
+        for n in self.listaAdjacencia[vertice]["negativo"]:
+            negativos.add(n)
+        return positivos, negativos
+
     def d(self, vertice):
-        return len(self.vizinho(vertice))
-
-    # Calculamos o grau de todos os vertices, e pegamos o menor dessa lista
+        vizinhosPositivos, vizinhosNegativos = self.vizinho(vertice)
+        return len(vizinhosPositivos), len(vizinhosNegativos)
+    
     def minD(self):
-        return min([self.d(vertice) for vertice in self.listaAdjacencia.keys()])
-
-    # O mesmo para o maior da lista
+        return min([(self.d(vert))[0] for vert in self.listaAdjacencia.keys()]),min([(self.d(vert))[1] for vert in self.listaAdjacencia.keys()])
+    
     def maxD(self):
-        return max([self.d(vertice) for vertice in self.listaAdjacencia.keys()])
-
+        return max([(self.d(vert))[0] for vert in self.listaAdjacencia.keys()]),max([(self.d(vert))[1] for vert in self.listaAdjacencia.keys()])
+    
     # Algoritmo BFS
     def bfs(self, vertice):
         # Temos a inicialização das variaveis de controle da distancia e do verice antecessor
@@ -128,7 +94,7 @@ class Grafo:
 
             # Para cada vizinho do vertice em questão, é atribuido a distância que ele está e que seu antecessor é o vertice em questão
             vizinho = self.vizinho(vert)
-            for i, _ in vizinho:
+            for i, _ in vizinho[0]:
                 if i in visitado or i in Q:
                     continue
                 d[i] = distancia
@@ -157,7 +123,6 @@ class Grafo:
 
                 # Marca o vértice como visitado e marca o tempo inicial e seu antecessor
                 visitado.add(vert)
-                
                 temp += 1
                 tempoInicial[vert] = temp
                 antecessores[vert] = antecessor
@@ -165,7 +130,7 @@ class Grafo:
 
                 # Obtemos os vizinhos do vértice para inclui-los na lista Q
                 vizinhos = self.vizinho(vert)
-                for i, _ in vizinhos:
+                for i, _ in vizinhos[0]:
 
                     # Se o vizinho ainda não foi visitado nem está na lista Q
                     if i not in visitado and i not in Q:
@@ -176,7 +141,7 @@ class Grafo:
         for vert in visitado:
             temp += 1
             tempoFinal[vert] = temp
-
+    
         return tempoInicial, tempoFinal, antecessores
 
     def BellmanFord(self, vertice):
@@ -203,7 +168,7 @@ class Grafo:
         # Por fim, verificamos se contém ciclos negativos dentro do grafo, mas é apenas como demostração já que o professor deixou claro que essa base não tem ciclos negativos
         for vertice in self.listaAdjacencia.keys():
             vizinhos = self.vizinho(vertice)
-            for vizinho, peso in vizinhos:
+            for vizinho, peso in vizinhos[0]:
                 # Verifica se há um ciclo negativo no grafo
                 if d[vizinho] > d[vertice] + peso:
                     return None, None, "Detectado ciclo negativo"
@@ -218,7 +183,7 @@ class Grafo:
 
         # Começamos relando as arestas dos vizinhos da raiz
         vizinhos = self.vizinho(raiz)
-        for vizinho, peso in vizinhos:
+        for vizinho, peso in vizinhos[0]:
             if d[vizinho] > d[raiz] + peso:
                 # Atualiza a distância e o antecessor do vizinho se encontrar um caminho mais curto
                 d[vizinho] = d[raiz] + peso
@@ -226,7 +191,7 @@ class Grafo:
 
         for vertice in self.listaAdjacencia.keys():
             vizinhos = self.vizinho(vertice)
-            for vizinho, peso in vizinhos:
+            for vizinho, peso in vizinhos[0]:
                 if d[vizinho] > d[vertice] + peso:
                     # Atualiza a distância e o antecessor do vizinho se encontrar um caminho mais curto
                     d[vizinho] = d[vertice] + peso
@@ -270,7 +235,7 @@ class Grafo:
             # Nesse ponto, atualizamos as distâncias dos vizinhos do vértice atual
             self.relaxaDijkstra(d, antecessor, vert)
             vizinhos = self.vizinho(vert)
-            for vizinho, _ in vizinhos:
+            for vizinho, _ in vizinhos[0]:
                 # Aqueles que já foram visitados, ou ja se encontram na lista de espera, são ignorados
                 if vizinho in visitado or vizinho in Q:
                     continue
@@ -283,7 +248,7 @@ class Grafo:
 
         # Obtém os vizinhos do vértice atual
         vizinhos = self.vizinho(vertice)
-        for vizinho, peso in vizinhos:
+        for vizinho, peso in vizinhos[0]:
             # Se encontrar um caminho mais curto para o vizinho, atualizamos sua distância e antecessor
             if d[vizinho] > d[vertice] + peso:
                 d[vizinho] = d[vertice] + peso
@@ -310,7 +275,7 @@ class Grafo:
                     pai = T[pai]
 
                 # Ao chegarmos a raiz, se o tamanho do caminho satisfizer a condição, retornamos o caminho.
-                if len(caminho) == valor:
+                if len(caminho) >= valor:
                     return caminho
 
                 # Do contrário, o caminho é limpo e reiniciado
@@ -319,8 +284,9 @@ class Grafo:
                     continue
 
         # Caso não haja um caminho com o valor requisitado
-        return f"Não encontramos um caminho com tamanho: {valor}"
+        return None
     
+    # Algoritmo 
     def BuscarCiclos(self, valor,T):
 
         ciclos = self.EncontrarCaminho(valor, T)
@@ -332,17 +298,18 @@ class Grafo:
             ciclosReverso.reverse()
             for vertice in ciclos:
                 vizinhos = self.vizinho(vertice)
-                for vizinho,_ in vizinhos:
-                    if ciclosReverso == vizinho:
+                for vizinho,_ in vizinhos[0]:
+                    if ciclosReverso[0] == vizinho:
                         index = ciclos.index(vertice)
-                        if index >= 3:
+                        if index >= 5:
                             ciclo = ciclosReverso[0:index]
                             ciclo.append(ciclosReverso[0])
                             return ciclo
-            return f"Não encontramos ciclos de tamanho >= 5"
+            return f"Não há ciclos de tamanho >= 5"
         
     def MaisDistante(self, vertice):
         d, _ = self.Dijkstra(vertice)
         maior = max(d.items(), key=operator.itemgetter(1))
         
         return maior
+            
