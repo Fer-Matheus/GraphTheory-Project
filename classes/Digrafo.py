@@ -1,12 +1,28 @@
 from classes.Grafo import Grafo
 import heapq, operator
+# Cófigo fonte da Classe Digrafo que será base para comportar todas as funcionalidades de grafos com arestas orientadas
+
 # Tamanho inicial das arestas antes do relaxamento
 MAX_TAM = 10000000000000000000000000000000000000000000
 class Digrafo(Grafo):
+    
+    # Construtor da classe que inicializa a lista de adjacência usada como representação do grafo
+    """Exemplo:
+        {
+            vertice1: {
+                "positivo" : [(vizinho1,peso), ...]
+                "negativo" : [(vizinho1,peso), ...]
+            }
+            .
+            .
+            .
+        }
+    """
     def __init__(self, caminhoArquivo=str):
         self.listaAdjacencia = {}
         self.LerArquivo(caminhoArquivo)
 
+    # Leitura do arquivo que contém o banco de dados a serem tratados como digrafo. Sua execução inicial é semelhante à classe Grafo, com mudanças na vizinhaça
     def LerArquivo(self, caminhoArquivo):
         with open(caminhoArquivo, "+r") as linha:
             linhas = linha.readlines()
@@ -16,6 +32,7 @@ class Digrafo(Grafo):
                 _, verticeA, verticeB, peso = linha.split(" ")
                 peso = int(peso)
                 if verticeA in self.listaAdjacencia.keys():
+                    # A mudança substancial é na adição da vizinhaça positiva (vértices que são alcançaveis pelo vértice A)
                     if "positivo" in self.listaAdjacencia[verticeA].keys():
                         self.listaAdjacencia[verticeA]["positivo"].append(
                             (verticeB, peso))
@@ -26,6 +43,7 @@ class Digrafo(Grafo):
                     self.listaAdjacencia.update(
                         {verticeA: {"positivo": [(verticeB, peso)]}})
                 if verticeB in self.listaAdjacencia.keys():
+                    # Aqui adicionamos os vértices que alcançam o vértice A
                     if "negativo" in self.listaAdjacencia[verticeB].keys():
                         self.listaAdjacencia[verticeB]["negativo"].append(
                             (verticeA, peso))
@@ -38,12 +56,14 @@ class Digrafo(Grafo):
         except:
             pass
 
+    # Uma representação visual, que será exibida no terminal
     def MostrarGrafo(self):
         for vertice in self.listaAdjacencia.keys():
             p, n = self.vizinho(vertice)
             print(
                 f'Vertice({vertice}):\n"positivos" : {p} || "negativos" : {n}')
 
+    # Aqui temos a devolução da lista de vizinhos do vértice em questão, dividindo entre os vizinhos positivos e negativos
     def vizinho(self, vertice):
         positivos, negativos = set(), set()
 
@@ -53,19 +73,35 @@ class Digrafo(Grafo):
             negativos.add(n)
         return positivos, negativos
 
+    # Retorna o número de vértices presentes na lista de adjacência
+    def n(self):
+        return len(self.listaAdjacencia.keys())
+    
+    # Retorna o número de arcos presentes na lista de adjacência
+    def m(self):
+        somaArcos = 0
+        for vertice in self.listaAdjacencia.keys():
+            vizinhos = self.vizinho()
+            somaArcos += len(vizinhos[0])
+            somaArcos += len(vizinhos[1])
+        return somaArcos
+
+    # No cálculo do grau de um vértice, verificamos o tamanho da lista dos vizinhos positivos e negativos, devolvendo o valor respectivo de cada.
     def d(self, vertice):
         vizinhosPositivos, vizinhosNegativos = self.vizinho(vertice)
         return len(vizinhosPositivos), len(vizinhosNegativos)
     
+    # Aqui é apenas gerado uma lista com todos os graus dos vértices da lista de adjacência, devolvendo o menor valor dos graus positivos e negativos
     def minD(self):
         return min([(self.d(vert))[0] for vert in self.listaAdjacencia.keys()]),min([(self.d(vert))[1] for vert in self.listaAdjacencia.keys()])
     
+    # Aqui é apenas gerado uma lista com todos os graus dos vértices da lista de adjacência, devolvendo o maior valor dos graus positivos e negativos
     def maxD(self):
         return max([(self.d(vert))[0] for vert in self.listaAdjacencia.keys()]),max([(self.d(vert))[1] for vert in self.listaAdjacencia.keys()])
     
     # Algoritmo BFS
     def bfs(self, vertice):
-        # Temos a inicialização das variaveis de controle da distancia e do verice antecessor
+        # Temos a inicialização das variáveis de controle da distancia e do verice antecessor
         distancia, antecessor = 0, None
 
         # inicializamos também dois dicionarios que vão armazenar as distâncias e antecessores de cada vertice
