@@ -1,5 +1,5 @@
 import heapq, operator
-# Cófigo fonte da Classe Digrafo que será base para comportar todas as funcionalidades de grafos com arestas orientadas
+# Código fonte da Classe Digrafo que será base para comportar todas as funcionalidades de grafos com arestas orientadas
 
 # Tamanho inicial das arestas antes do relaxamento
 MAX_TAM = 10000000000000000000000000000000000000000000
@@ -42,7 +42,7 @@ class Digrafo():
                     self.listaAdjacencia.update(
                         {verticeA: {"positivo": [(verticeB, peso)]}})
                 if verticeB in self.listaAdjacencia.keys():
-                    # Aqui adicionamos os vértices que alcançam o vértice A
+                    # Aqui adicionamos a vizinhança negativa (vértices que alcançam o vértice A)
                     if "negativo" in self.listaAdjacencia[verticeB].keys():
                         self.listaAdjacencia[verticeB]["negativo"].append(
                             (verticeA, peso))
@@ -103,7 +103,7 @@ class Digrafo():
         # Temos a inicialização das variáveis de controle da distancia e do verice antecessor
         distancia, antecessor = 0, None
 
-        # inicializamos também dois dicionarios que vão armazenar as distâncias e antecessores de cada vertice
+        # Inicializamos também dois dicionarios que vão armazenar as distâncias e antecessores de cada vertice
         d, antecessores = {}, {}
 
         # Visitado será usado para verificar os vertices que já foram iterados, bem como Q é a lista daqueles que ainda serão visitados
@@ -127,7 +127,7 @@ class Digrafo():
             distancia += 1
             antecessor = vert
 
-            # Para cada vizinho do vertice em questão, é atribuido a distância que ele está e que seu antecessor é o vertice em questão
+            # Para cada vizinho do vertice em questão, é atribuido a distância que ele está e seu antecessor do vertice em questão
             vizinho = self.vizinho(vert)
             for i, _ in vizinho[0]:
                 if i in visitado or i in Q:
@@ -171,7 +171,7 @@ class Digrafo():
                     if i not in visitado and i not in Q:
                         Q.append(i)
 
-        # Por fim, marcamos os tempos finais de acesso dos vertices visitados na ordem reversa de entrada
+        # Por fim, marcamos os tempos finais de acesso dos vertices visitados na ordem contrária de entrada
         visitado = sorted(visitado, reverse=True)
         for vert in visitado:
             temp += 1
@@ -200,7 +200,7 @@ class Digrafo():
             if not self.relaxaBF(d, antecessor, vertice):
                 break
 
-        # Por fim, verificamos se contém ciclos negativos dentro do grafo, mas é apenas como demostração já que o professor deixou claro que essa base não tem ciclos negativos
+        # Por fim, verificamos se contém ciclos negativos dentro do grafo, mas é apenas como demostração já que essa base de dados não tem ciclos negativos
         for vertice in self.listaAdjacencia.keys():
             vizinhos = self.vizinho(vertice)
             for vizinho, peso in vizinhos[0]:
@@ -216,7 +216,7 @@ class Digrafo():
         # Variável para verificar se houve alteração nas distâncias, foi um meio pensado para evitar iterações desnecessárias
         verificaMudanca = False
 
-        # Começamos relando as arestas dos vizinhos da raiz
+        # Começamos relaxando as arestas dos vizinhos da raiz
         vizinhos = self.vizinho(raiz)
         for vizinho, peso in vizinhos[0]:
             if d[vizinho] > d[raiz] + peso:
@@ -246,7 +246,7 @@ class Digrafo():
         [antecessor.update({vert: None})
          for vert in self.listaAdjacencia.keys()]
 
-        # Iniciando pelo vértice escolhido pelo usuário
+        # Iniciamos pelo vértice escolhido pelo usuário
         d[vertice] = 0
 
         # Aqui usamos um lista de prioridade
@@ -309,7 +309,7 @@ class Digrafo():
                     caminho.append(pai)
                     pai = T[pai]
 
-                # Ao chegarmos a raiz, se o tamanho do caminho satisfizer a condição, retornamos o caminho.
+                # Ao chegarmos na raiz, se o tamanho do caminho satisfizer a condição, retornamos o caminho.
                 if len(caminho) >= valor:
                     return caminho
 
@@ -321,30 +321,31 @@ class Digrafo():
         # Caso não haja um caminho com o valor requisitado
         return None
     
-    # Algoritmo 
+    # Algoritmo para buscar ciclos existentes no digrafo
     def BuscarCiclos(self,T):
 
         # Para a busca de ciclos, primeiro encontramos um caminho com o tamanho 50, que foi escolhido de forma arbitrária
         ciclos = self.EncontrarCaminho(50, T)
         
-        # Nesse ponto, criamos uma copia do caminho que estamos utilizando para encontrar ciclos, mas o colocamos em ordem reversa
+        # Nesse ponto, criamos uma copia do caminho que estamos utilizando para encontrar ciclos, mas o colocamos em ordem contrária
         ciclosReverso = ciclos.copy()
         ciclosReverso.reverse()
         
-        # Nesse ponto testamos os vizinhos de cada vertice na lista ciclo, verificando se o primeiro item da lista reversa se encontra entre os vizinhos.
+        # Nesse ponto testamos os vizinhos de cada vertice na lista ciclo, verificando se o primeiro item da lista contrária se encontra entre os vizinhos.
         # Se sim, indica que há uma aresta de retorno para a raiz de T, indicando um ciclo
         for vertice in ciclos:
             vizinhos = self.vizinho(vertice)
             for vizinho,_ in vizinhos[0]:
                 if ciclosReverso[0] == vizinho:
                     index = ciclos.index(vertice)
-                    # Aqui verificamos se esse ciclo tem tamanho maior igual a 5, já que por T ser uma árvore, não a repetição de vértices internos
+                    # Aqui verificamos se esse ciclo tem tamanho maior igual a 5, já que por T ser uma árvore, não há repetição de vértices internos
                     if index >= 5:
                         ciclo = ciclosReverso[0:index]
                         ciclo.append(ciclosReverso[0])
                         return ciclo
         return f"Não há ciclos de tamanho >= 5"
-        
+
+    #Aqui verificamos todas as distâncias do algoritmo de Dijkstra e retornamos o maior
     def MaisDistante(self, vertice):
         d, _ = self.Dijkstra(vertice)
         maior = max(d.items(), key=operator.itemgetter(1))
