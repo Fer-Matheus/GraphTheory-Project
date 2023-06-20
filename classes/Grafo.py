@@ -321,25 +321,28 @@ class Grafo:
         # Caso não haja um caminho com o valor requisitado
         return f"Não encontramos um caminho com tamanho: {valor}"
     
-    def BuscarCiclos(self, valor,T):
-
-        ciclos = self.EncontrarCaminho(valor, T)
+    def BuscarCiclos(self,T):
         
-        if ciclos == None:
-            return f"Não há ciclos de tamanho >= 5"
-        else:
-            ciclosReverso = ciclos.copy()
-            ciclosReverso.reverse()
-            for vertice in ciclos:
-                vizinhos = self.vizinho(vertice)
-                for vizinho,_ in vizinhos:
-                    if ciclosReverso == vizinho:
-                        index = ciclos.index(vertice)
-                        if index >= 3:
-                            ciclo = ciclosReverso[0:index]
-                            ciclo.append(ciclosReverso[0])
-                            return ciclo
-            return f"Não encontramos ciclos de tamanho >= 5"
+        # Para a busca de ciclos, primeiro encontramos um caminho com o tamanho 50, que foi escolhido de forma arbitrária
+        ciclos = self.EncontrarCaminho(50, T)
+        
+        # Nesse ponto, criamos uma copia do caminho que estamos utilizando para encontrar ciclos, mas o colocamos em ordem reversa
+        ciclosReverso = ciclos.copy()
+        ciclosReverso.reverse()
+        
+        # Nesse ponto testamos os vizinhos de cada vertice na lista ciclo, verificando se o primeiro item da lista reversa se encontra entre os vizinhos.
+        # Se sim, indica que há uma aresta de retorno para a raiz de T, indicando um ciclo
+        for vertice in ciclos:
+            vizinhos = self.vizinho(vertice)
+            for vizinho,_ in vizinhos:
+                if ciclosReverso[0] == vizinho:
+                    index = ciclos.index(vertice)
+                    # Aqui verificamos se esse ciclo tem tamanho maior igual a 5, já que por T ser uma árvore, não a repetição de vértices internos
+                    if index >= 5:
+                        ciclo = ciclosReverso[0:index]
+                        ciclo.append(ciclosReverso[0])
+                        return ciclo
+        return f"Não encontramos ciclos de tamanho >= 5"
         
     def MaisDistante(self, vertice):
         d, _ = self.Dijkstra(vertice)

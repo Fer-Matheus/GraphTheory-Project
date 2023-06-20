@@ -1,10 +1,9 @@
-from classes.Grafo import Grafo
 import heapq, operator
 # Cófigo fonte da Classe Digrafo que será base para comportar todas as funcionalidades de grafos com arestas orientadas
 
 # Tamanho inicial das arestas antes do relaxamento
 MAX_TAM = 10000000000000000000000000000000000000000000
-class Digrafo(Grafo):
+class Digrafo():
     
     # Construtor da classe que inicializa a lista de adjacência usada como representação do grafo
     """Exemplo:
@@ -323,25 +322,28 @@ class Digrafo(Grafo):
         return None
     
     # Algoritmo 
-    def BuscarCiclos(self, valor,T):
+    def BuscarCiclos(self,T):
 
-        ciclos = self.EncontrarCaminho(valor, T)
+        # Para a busca de ciclos, primeiro encontramos um caminho com o tamanho 50, que foi escolhido de forma arbitrária
+        ciclos = self.EncontrarCaminho(50, T)
         
-        if ciclos == None:
-            return f"Não há ciclos de tamanho >= 5"
-        else:
-            ciclosReverso = ciclos.copy()
-            ciclosReverso.reverse()
-            for vertice in ciclos:
-                vizinhos = self.vizinho(vertice)
-                for vizinho,_ in vizinhos[0]:
-                    if ciclosReverso[0] == vizinho:
-                        index = ciclos.index(vertice)
-                        if index >= 5:
-                            ciclo = ciclosReverso[0:index]
-                            ciclo.append(ciclosReverso[0])
-                            return ciclo
-            return f"Não há ciclos de tamanho >= 5"
+        # Nesse ponto, criamos uma copia do caminho que estamos utilizando para encontrar ciclos, mas o colocamos em ordem reversa
+        ciclosReverso = ciclos.copy()
+        ciclosReverso.reverse()
+        
+        # Nesse ponto testamos os vizinhos de cada vertice na lista ciclo, verificando se o primeiro item da lista reversa se encontra entre os vizinhos.
+        # Se sim, indica que há uma aresta de retorno para a raiz de T, indicando um ciclo
+        for vertice in ciclos:
+            vizinhos = self.vizinho(vertice)
+            for vizinho,_ in vizinhos[0]:
+                if ciclosReverso[0] == vizinho:
+                    index = ciclos.index(vertice)
+                    # Aqui verificamos se esse ciclo tem tamanho maior igual a 5, já que por T ser uma árvore, não a repetição de vértices internos
+                    if index >= 5:
+                        ciclo = ciclosReverso[0:index]
+                        ciclo.append(ciclosReverso[0])
+                        return ciclo
+        return f"Não há ciclos de tamanho >= 5"
         
     def MaisDistante(self, vertice):
         d, _ = self.Dijkstra(vertice)
