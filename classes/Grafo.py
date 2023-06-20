@@ -1,6 +1,6 @@
 import heapq
 import operator
-# Cófigo fonte da Classe Grafo que será base para comportar todas as funcionalidades de grafos não orientados
+# Código fonte da Classe Grafo que será base para comportar todas as funcionalidades de grafos não orientados
 
 # Tamanho inicial das arestas antes do relaxamento
 MAX_TAM = 10000000000000000000000000000000000000000000
@@ -29,7 +29,7 @@ class Grafo:
     # Leitura do arquivo que contém o banco de dados a ser tratado como grafo
     def LerArquivo(self, caminhoArquivo):
 
-        # Executando a leitura do db e armazenando em linhas
+        # Executando a leitura do BD e armazenando em linhas
         with open(caminhoArquivo, "+r") as linha:
             linhas = linha.readlines()
 
@@ -60,7 +60,7 @@ class Grafo:
         for vertice in self.listaAdjacencia.keys():
             print(f"{vertice}: {self.vizinho(vertice)}")
 
-    # função que cria um arquivo no formato {vertice: [lista de vizinhos]}, apenas para facilitar uma verificação nossa nos testes
+    # Função que cria um arquivo no formato {vertice: [lista de vizinhos]}, apenas para facilitar uma verificação nossa nos testes
     def EscrevelistaAdjacencia(self, nomeArquivo):
         with open(f"db/{nomeArquivo}_listaAdjacencia.txt", "+w") as arquivo:
             for vertice in self.listaAdjacencia.keys():
@@ -93,16 +93,16 @@ class Grafo:
     def minD(self):
         return min([self.d(vertice) for vertice in self.listaAdjacencia.keys()])
 
-    # O mesmo para o maior da lista
+    # O mesmo da função acima para o maior da lista
     def maxD(self):
         return max([self.d(vertice) for vertice in self.listaAdjacencia.keys()])
 
     # Algoritmo BFS
     def bfs(self, vertice):
-        # Temos a inicialização das variaveis de controle da distancia e do verice antecessor
+        # Temos a inicialização das variáveis de controle da distância e do verice antecessor
         distancia, antecessor = 0, None
 
-        # inicializamos também dois dicionarios que vão armazenar as distâncias e antecessores de cada vertice
+        # Inicializamos também dois dicionários que vão armazenar as distâncias e antecessores de cada vertice
         d, antecessores = {}, {}
 
         # Visitado será usado para verificar os vertices que já foram iterados, bem como Q é a lista daqueles que ainda serão visitados
@@ -121,7 +121,7 @@ class Grafo:
             if vert in visitado:
                 continue
 
-            # Caso não, ele é adicionado a lista de visitados, e a distancia e o antecessor são atualizados
+            # Caso não, ele é adicionado a lista de visitados, e a distância e o antecessor são atualizados
             visitado.add(vert)
             distancia += 1
             antecessor = vert
@@ -139,7 +139,7 @@ class Grafo:
 
     # Algoritmo de busca em profundidade (DFS) para grafos
     def dfs(self, vertice):
-        # Conjunto para os nós visitados, variavel de tempo e antecessor
+        # Conjunto para os nós visitados, variável de tempo e antecessor
         visitado, temp, antecessor = set(), 0, None
 
         # Dicionários e lista auxiliares
@@ -171,7 +171,7 @@ class Grafo:
                     if i not in visitado and i not in Q:
                         Q.append(i)
 
-        # Por fim, marcamos os tempos finais de acesso dos vertices visitados na ordem reversa de entrada
+        # Por fim, marcamos os tempos finais de acesso dos vertices visitados na ordem contrária de entrada
         visitado = sorted(visitado, reverse=True)
         for vert in visitado:
             temp += 1
@@ -200,7 +200,7 @@ class Grafo:
             if not self.relaxaBF(d, antecessor, vertice):
                 break
 
-        # Por fim, verificamos se contém ciclos negativos dentro do grafo, mas é apenas como demostração já que o professor deixou claro que essa base não tem ciclos negativos
+        # Por fim, verificamos se contém ciclos negativos dentro do grafo, mas é apenas como demostração já que essa base de dados não tem ciclos negativos
         for vertice in self.listaAdjacencia.keys():
             vizinhos = self.vizinho(vertice)
             for vizinho, peso in vizinhos:
@@ -216,7 +216,7 @@ class Grafo:
         # Variável para verificar se houve alteração nas distâncias, foi um meio pensado para evitar iterações desnecessárias
         verificaMudanca = False
 
-        # Começamos relando as arestas dos vizinhos da raiz
+        # Começamos relaxando as arestas dos vizinhos da raiz
         vizinhos = self.vizinho(raiz)
         for vizinho, peso in vizinhos:
             if d[vizinho] > d[raiz] + peso:
@@ -241,15 +241,15 @@ class Grafo:
         # Dicionários e listas auxiliares
         d, antecessor, Q, visitado = {}, {}, [], set()
 
-        # Definindo peso e antecessor padrão para todos
+        # Definimos peso e antecessor padrão para todos
         [d.update({vert: MAX_TAM})for vert in self.listaAdjacencia.keys()]
         [antecessor.update({vert: None})
          for vert in self.listaAdjacencia.keys()]
 
-        # Iniciando pelo vértice escolhido pelo usuário
+        # Iniciamos pelo vértice escolhido pelo usuário
         d[vertice] = 0
 
-        # Aqui usamos um lista de prioridade
+        # Aqui usamos uma lista de prioridade
         heapq.heappush(Q, vertice)
         """
             vert = A
@@ -320,30 +320,32 @@ class Grafo:
 
         # Caso não haja um caminho com o valor requisitado
         return f"Não encontramos um caminho com tamanho: {valor}"
-    
+
+    # Algoritmo para buscar ciclos existentes no grafo
     def BuscarCiclos(self,T):
         
         # Para a busca de ciclos, primeiro encontramos um caminho com o tamanho 50, que foi escolhido de forma arbitrária
         ciclos = self.EncontrarCaminho(50, T)
         
-        # Nesse ponto, criamos uma copia do caminho que estamos utilizando para encontrar ciclos, mas o colocamos em ordem reversa
+        # Nesse ponto, criamos uma copia do caminho que estamos utilizando para encontrar ciclos, mas o colocamos em ordem contrária
         ciclosReverso = ciclos.copy()
         ciclosReverso.reverse()
         
-        # Nesse ponto testamos os vizinhos de cada vertice na lista ciclo, verificando se o primeiro item da lista reversa se encontra entre os vizinhos.
+        # Nesse ponto testamos os vizinhos de cada vertice na lista ciclo, verificando se o primeiro item da lista contrária se encontra entre os vizinhos.
         # Se sim, indica que há uma aresta de retorno para a raiz de T, indicando um ciclo
         for vertice in ciclos:
             vizinhos = self.vizinho(vertice)
             for vizinho,_ in vizinhos:
                 if ciclosReverso[0] == vizinho:
                     index = ciclos.index(vertice)
-                    # Aqui verificamos se esse ciclo tem tamanho maior igual a 5, já que por T ser uma árvore, não a repetição de vértices internos
+                    # Aqui verificamos se esse ciclo tem tamanho maior igual a 5, já que por T ser uma árvore, não há repetição de vértices internos
                     if index >= 5:
                         ciclo = ciclosReverso[0:index]
                         ciclo.append(ciclosReverso[0])
                         return ciclo
         return f"Não encontramos ciclos de tamanho >= 5"
-        
+
+    #Aqui verificamos todas as distâncias do algoritmo de Dijkstra e retornamos o maior
     def MaisDistante(self, vertice):
         d, _ = self.Dijkstra(vertice)
         maior = max(d.items(), key=operator.itemgetter(1))
